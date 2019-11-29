@@ -252,19 +252,11 @@
   </footer>
 </div> <!--  end id wrapper -->
 
+	
+	
 <script>
 
-  /*
-  function InningPlay() {
-    this.inningScore = 0;
-	this.runningScore = 0;
-	this.inningThrows = "";
-	this.inningString = "";
-	this.inningCancelRingers = 0;
-	this.inningScoredRingers = 0;
-	this.inningTotalRingers = function() {return this.inningCancelRingers + this.inningScoredRingers;};
-  }// InningPlay()
-  */
+
   
   function Player(name){
     this.name = name;
@@ -1009,6 +1001,11 @@
 	  needOvertime = true;
 	  //  will need a variable for overtime shoes, etc.
     }
+  }
+	
+  function endOfGame() {
+    document.getElementById("shoesPrompt").innerHTML = "GAME ";
+    document.getElementById("shoesPlayed").innerHTML = "OVER";
   }
   
   function isPossibleToScore() {

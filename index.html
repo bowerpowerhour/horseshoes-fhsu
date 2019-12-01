@@ -158,7 +158,7 @@
         </div> <!-- end id inningButtons -->
 
       </div> <!--  end id allInningStuff -->
-      
+
       <div id="gameLog">
         <div id="gameSummaryPrompt">
           <label>Game Summary</label>
@@ -351,71 +351,6 @@
 
         var okToCloseInning = false;
 
-        function increaseCurrentInning() {currentInning++};
-        function decreaseCurrentInning() {currentInning--};
-        function increaseCompletedShoes() {completedShoes+=2};
-        function decreaseCompletedShoes() {completedShoes-=2};
-        function currentShoeString() {
-          return "Shoes #" + (completedShoes + 1) + "& #" + (completedShoes + 2)
-        }
-
-        function editPlayerNames() {
-          // Get new player names & update on main scoreboard/tables
-          var responseOne = prompt("Enter the name of Player One", playerOne.name);
-          if (responseOne !== null && responseOne != "") {
-            playerOne.name = responseOne;
-          }
-          document.getElementById("playerOneNameLarge").innerHTML = playerOne.name;
-          document.getElementById("playerOneCaption").innerHTML = playerOne.name;
-
-          var responseTwo = prompt("Enter the name of Player Two", playerTwo.name);
-          if (responseTwo !== null && responseTwo != "") {
-            playerTwo.name = responseTwo;
-          }
-          document.getElementById("playerTwoNameLarge").innerHTML = playerTwo.name;
-          document.getElementById("playerTwoCaption").innerHTML = playerTwo.name;
-        }
-
-        function updateScoreboard() {
-          // Update player names
-          document.getElementById("playerOneNameLarge").innerHTML = playerOne.name;
-          document.getElementById("playerTwoNameLarge").innerHTML = playerTwo.name;
-          // Update player scores
-          document.getElementById("playerOneOverallPoints").innerHTML = playerOne.totalScore();
-          document.getElementById("playerTwoOverallPoints").innerHTML = playerTwo.totalScore();
-          // Update shoes - same for each player
-          document.getElementById("shoesPlayed").innerHTML = completedShoes;
-
-          // Update expected length of game (not concerned with overtime yet)
-          //  Not concerned with overtime yet... I'll fill this in if I include overtime play
-
-          // Update game summary in tables
-          document.getElementById("playerOneCaption").innerHTML = playerOne.name;
-          document.getElementById("playerTwoCaption").innerHTML = playerTwo.name;
-          var playerOneTable = document.getElementById("tableForOne");
-          var playerTwoTable = document.getElementById("tableForTwo");
-          addRowToTable(playerOne, playerOneTable);
-          addRowToTable(playerTwo, playerTwoTable);
-
-          // Update statistics
-          document.getElementById("playerOneTotalRingers").innerHTML = playerOne.totalRingers();
-          document.getElementById("playerOneRingerPercentage").innerHTML = ((playerOne.totalRingers() / completedShoes) * 100).toFixed(1) + "%";
-          document.getElementById("playerTwoTotalRingers").innerHTML = playerTwo.totalRingers();
-          document.getElementById("playerTwoRingerPercentage").innerHTML = ((playerTwo.totalRingers() / completedShoes) * 100).toFixed(1) + "%";
-
-        }
-
-        function addRowToTable (plyr, table) {
-          var row = table.insertRow(-1);
-          var cellShoes = row.insertCell(0);
-          var cellResult = row.insertCell(1);
-          var cellScore = row.insertCell(2);
-          var cellTotal = row.insertCell(3);
-          cellShoes.innerHTML = completedShoes;
-          cellResult.innerHTML = plyr.inningString[currentInning];
-          cellScore.innerHTML = plyr.inningScore[currentInning];
-          cellTotal.innerHTML = plyr.runningScore(currentInning);
-        }
 
         // "ENTER NEXT INNING" button was clicked
         $(document).ready(function(){
@@ -534,6 +469,20 @@
             $("#gameLog").fadeIn();
           });
         });
+
+
+        function addRowToTable (plyr, table) {
+          var row = table.insertRow(-1);
+          var cellShoes = row.insertCell(0);
+          var cellResult = row.insertCell(1);
+          var cellScore = row.insertCell(2);
+          var cellTotal = row.insertCell(3);
+          cellShoes.innerHTML = completedShoes;
+          cellResult.innerHTML = plyr.inningString[currentInning];
+          cellScore.innerHTML = plyr.inningScore[currentInning];
+          cellTotal.innerHTML = plyr.runningScore(currentInning);
+        }
+
 
         function boxWasChecked(boxNumber){
           switch (boxNumber){
@@ -984,6 +933,7 @@
           inningScoreboardUpdate();
         }
 
+
         function changeVisibility(index, shouldBeVisible) {
           if (shouldBeVisible) {
             scoringLabels[index].style.visibility = "visible";
@@ -995,25 +945,8 @@
           }
         }
 
-        function uncheckAndInvisible(index) {
-          allCheckboxes[index].checked = false;
-          changeVisibility(index, false);
-        }
 
-        function reset(){
-          // Reset checkboxes & labels
-          for (var i = 0; i < allCheckboxes.length; i++) {
-            allCheckboxes[i].checked = false;
-            changeVisibility(i, true);
-          }
-          // Nothing in the scoring labels
-          document.getElementById("playerOneInningResult").innerHTML = "";
-          document.getElementById("playerTwoInningResult").innerHTML = "";
-          document.getElementById("playerOneInningPoints").innerHTML = "";
-          document.getElementById("playerTwoInningPoints").innerHTML = "";
-        }
-
-        function checkForWinner() {
+        function checkForWinner() {  // Didn't really use this since overtime not coded
           // Do we have a winner...
           if (playerOne.totalScore != playerTwo.totalScore) {
             isGameOver = true;
@@ -1027,64 +960,6 @@
           }
         }
 
-        function endOfGame() {
-          document.getElementById("shoesPrompt").innerHTML = "GAME ";
-          document.getElementById("shoesPlayed").innerHTML = "OVER";
-          alert("GAME OVER\n\n\n" +
-          playerOne.name + "  " + playerOne.totalScore() + "\n\n\n" +
-          playerTwo.name + "  " + playerTwo.totalScore());
-        }
-
-        function isPossibleToScore() {
-          // A final check to confirm it is OK to finalize the score of the inning
-          var thisIsOK = true;
-          // Don't allow Player 1 to have 1 point but no ringers if Player 2 has a ringer
-          if (allCheckboxes[3].checked && !allCheckboxes[1].checked && allCheckboxes[5].checked) {
-            thisIsOK = false;
-          }
-          // Don't allow Player 2 to have 1 point but no ringers if Player 1 has a ringer
-          if (allCheckboxes[7].checked && !allCheckboxes[5].checked && allCheckboxes[1].checked) {
-            thisIsOK = false;
-          }
-          return thisIsOK;
-        }
-
-        function inningScoreboardUpdate() {
-          playerOneGotScored = false;
-          playerTwoGotScored = false;
-          // Find which check boxes are checked and visible
-          for (var i = 0; i < allCheckboxes.length; i++) {
-            if (allCheckboxes[i].checked && scoringLabels[i].style.visibility == "visible") {
-              switch (i) {
-                case 0: case 1: case 2: case 3:  // Player One results
-                scoreThePlayer(playerOne, i)
-                playerOneGotScored = true;
-                break;
-                case 4: case 5: case 6: case 7:  // Player Two results
-                scoreThePlayer(playerTwo, i)
-                playerTwoGotScored = true;
-                break;
-                case 8:                       // No points scored by either player
-                scoreThePlayer(playerOne, i)
-                scoreThePlayer(playerTwo, i)
-                playerOneGotScored = true;
-                playerTwoGotScored = true;
-              }
-            }
-          }
-          // Take care of no checkboxes checked for a player
-          if (!playerOneGotScored) {scoreThePlayer(playerOne, 8);}
-          if (!playerTwoGotScored) {scoreThePlayer(playerTwo, 8);}
-
-          // Compare results of two players to check for cancel ringers, etc.
-          compareResults();
-
-          // Put information in labels for this inning's scoring
-          document.getElementById("playerOneInningResult").innerHTML = playerOne.inningString[currentInning];
-          document.getElementById("playerTwoInningResult").innerHTML = playerTwo.inningString[currentInning];
-          document.getElementById("playerOneInningPoints").innerHTML = playerOne.inningScore[currentInning];
-          document.getElementById("playerTwoInningPoints").innerHTML = playerTwo.inningScore[currentInning];
-        }
 
         function compareResults() {
           if (playerOne.inningThrows[currentInning] =="RR" && playerTwo.inningThrows[currentInning] == "RR") {
@@ -1361,6 +1236,114 @@
           }
         }
 
+
+        function currentShoeString() {
+          return "Shoes #" + (completedShoes + 1) + "& #" + (completedShoes + 2)
+        }
+
+
+        function decreaseCompletedShoes() {completedShoes-=2};
+
+        function decreaseCurrentInning() {currentInning--};
+
+        function editPlayerNames() {
+          // Get new player names & update on main scoreboard/tables
+          var responseOne = prompt("Enter the name of Player One", playerOne.name);
+          if (responseOne !== null && responseOne != "") {
+            playerOne.name = responseOne;
+          }
+          document.getElementById("playerOneNameLarge").innerHTML = playerOne.name;
+          document.getElementById("playerOneCaption").innerHTML = playerOne.name;
+
+          var responseTwo = prompt("Enter the name of Player Two", playerTwo.name);
+          if (responseTwo !== null && responseTwo != "") {
+            playerTwo.name = responseTwo;
+          }
+          document.getElementById("playerTwoNameLarge").innerHTML = playerTwo.name;
+          document.getElementById("playerTwoCaption").innerHTML = playerTwo.name;
+        }
+
+
+        function endOfGame() {
+          document.getElementById("shoesPrompt").innerHTML = "GAME ";
+          document.getElementById("shoesPlayed").innerHTML = "OVER";
+          alert("GAME OVER\n\n\n" +
+          playerOne.name + "  " + playerOne.totalScore() + "\n\n\n" +
+          playerTwo.name + "  " + playerTwo.totalScore());
+        }
+
+
+        function increaseCompletedShoes() {completedShoes+=2};
+
+        function increaseCurrentInning() {currentInning++};
+
+        function inningScoreboardUpdate() {
+          playerOneGotScored = false;
+          playerTwoGotScored = false;
+          // Find which check boxes are checked and visible
+          for (var i = 0; i < allCheckboxes.length; i++) {
+            if (allCheckboxes[i].checked && scoringLabels[i].style.visibility == "visible") {
+              switch (i) {
+                case 0: case 1: case 2: case 3:  // Player One results
+                scoreThePlayer(playerOne, i)
+                playerOneGotScored = true;
+                break;
+                case 4: case 5: case 6: case 7:  // Player Two results
+                scoreThePlayer(playerTwo, i)
+                playerTwoGotScored = true;
+                break;
+                case 8:                       // No points scored by either player
+                scoreThePlayer(playerOne, i)
+                scoreThePlayer(playerTwo, i)
+                playerOneGotScored = true;
+                playerTwoGotScored = true;
+              }
+            }
+          }
+          // Take care of no checkboxes checked for a player
+          if (!playerOneGotScored) {scoreThePlayer(playerOne, 8);}
+          if (!playerTwoGotScored) {scoreThePlayer(playerTwo, 8);}
+
+          // Compare results of two players to check for cancel ringers, etc.
+          compareResults();
+
+          // Put information in labels for this inning's scoring
+          document.getElementById("playerOneInningResult").innerHTML = playerOne.inningString[currentInning];
+          document.getElementById("playerTwoInningResult").innerHTML = playerTwo.inningString[currentInning];
+          document.getElementById("playerOneInningPoints").innerHTML = playerOne.inningScore[currentInning];
+          document.getElementById("playerTwoInningPoints").innerHTML = playerTwo.inningScore[currentInning];
+        }
+
+
+        function isPossibleToScore() {
+          // A final check to confirm it is OK to finalize the score of the inning
+          var thisIsOK = true;
+          // Don't allow Player 1 to have 1 point but no ringers if Player 2 has a ringer
+          if (allCheckboxes[3].checked && !allCheckboxes[1].checked && allCheckboxes[5].checked) {
+            thisIsOK = false;
+          }
+          // Don't allow Player 2 to have 1 point but no ringers if Player 1 has a ringer
+          if (allCheckboxes[7].checked && !allCheckboxes[5].checked && allCheckboxes[1].checked) {
+            thisIsOK = false;
+          }
+          return thisIsOK;
+        }
+
+
+        function reset(){
+          // Reset checkboxes & labels
+          for (var i = 0; i < allCheckboxes.length; i++) {
+            allCheckboxes[i].checked = false;
+            changeVisibility(i, true);
+          }
+          // Nothing in the scoring labels
+          document.getElementById("playerOneInningResult").innerHTML = "";
+          document.getElementById("playerTwoInningResult").innerHTML = "";
+          document.getElementById("playerOneInningPoints").innerHTML = "";
+          document.getElementById("playerTwoInningPoints").innerHTML = "";
+        }
+
+
         function scoreThePlayer(plyr, x) {
           // R - ringer   P - point for close shoe   * - a throw not a ringer or a point
           switch(x) {
@@ -1388,6 +1371,41 @@
             default:
             plyr.inningThrows[currentInning] = "**";  // should never happen!
           }
+        }
+
+
+        function uncheckAndInvisible(index) {
+          allCheckboxes[index].checked = false;
+          changeVisibility(index, false);
+        }
+
+
+        function updateScoreboard() {
+          // Update player names
+          document.getElementById("playerOneNameLarge").innerHTML = playerOne.name;
+          document.getElementById("playerTwoNameLarge").innerHTML = playerTwo.name;
+          // Update player scores
+          document.getElementById("playerOneOverallPoints").innerHTML = playerOne.totalScore();
+          document.getElementById("playerTwoOverallPoints").innerHTML = playerTwo.totalScore();
+          // Update shoes - same for each player
+          document.getElementById("shoesPlayed").innerHTML = completedShoes;
+
+          // Update expected length of game (not concerned with overtime yet)
+          //  Not concerned with overtime yet... I'll fill this in if I include overtime play
+
+          // Update game summary in tables
+          document.getElementById("playerOneCaption").innerHTML = playerOne.name;
+          document.getElementById("playerTwoCaption").innerHTML = playerTwo.name;
+          var playerOneTable = document.getElementById("tableForOne");
+          var playerTwoTable = document.getElementById("tableForTwo");
+          addRowToTable(playerOne, playerOneTable);
+          addRowToTable(playerTwo, playerTwoTable);
+
+          // Update statistics
+          document.getElementById("playerOneTotalRingers").innerHTML = playerOne.totalRingers();
+          document.getElementById("playerOneRingerPercentage").innerHTML = ((playerOne.totalRingers() / completedShoes) * 100).toFixed(1) + "%";
+          document.getElementById("playerTwoTotalRingers").innerHTML = playerTwo.totalRingers();
+          document.getElementById("playerTwoRingerPercentage").innerHTML = ((playerTwo.totalRingers() / completedShoes) * 100).toFixed(1) + "%";
         }
 
 

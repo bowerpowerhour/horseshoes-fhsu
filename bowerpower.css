@@ -258,11 +258,15 @@ th { color: #FFFFFF;
 }
 
 
+=======
+
 @media only screen and (max-width: 37.5em) {
 	h1, h2 { font-size: 100%; }
   span { font-size: 80%; }
+
+  fieldset{ font-size: 70%; }
   button {font-size: 100%; }
-  footer {font-size: 70%; }
+  footer {font-size: 60%; }
   .columnOfTwo {width: 100%; }
   #gameLength{font-size: 90%; }
   #shoes {font-size: 90%;
